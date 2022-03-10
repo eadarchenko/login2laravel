@@ -10,24 +10,24 @@ use App\User;
 
 class AuthController extends Controller
 {
-    public function register(Request $request){
-
-        $request->validate([
-            'name'=>'required|string',
-            'email'=>'required|string|unique',
-            'password' => 'required|string|min:6'
-
+    
+    protected function register(array $data){
+        return Validator::make($data,[
+            'nickname'=>['required','string','max:255','unique:name'],
+            'email'=>['required','string','max:255','unique:users'],
+            'password'=>['required','string','min:8',]
         ]);
-
-        $user = new User ([
-            'name' => $request->name,
-            'email' =>$request->email,
-            'password' => Hash::make($request->password)
-        ]);
-
-        $user->save();
-        return response()->json(['message'=>'Usuario logueado con exito!'],200);
     }
+
+    protected function create(array $data) {
+        return User::create([
+            'nickname' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']), //encrypta la contraseña
+        ]);
+    }
+    }
+
     public function login(Request $request){
         $request->validate([
 
